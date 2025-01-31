@@ -1,6 +1,7 @@
 package com.auth.controller;
 
 import com.auth.Dto.UserDto;
+import com.auth.models.User;
 import com.auth.services.UserService;
 import com.auth.utils.JwtUtils;
 
@@ -35,7 +36,8 @@ public class UserController {
         // Validate credentials using AuthenticationManager
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        // only get save value inside token
+        User userDetails = (User) authentication.getPrincipal();
         // Generate JWT token
         String jwtToken = jwtUtils.generateJwtToken(userDetails.getUsername());
 

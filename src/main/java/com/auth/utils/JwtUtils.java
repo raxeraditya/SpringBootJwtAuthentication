@@ -1,10 +1,11 @@
 package com.auth.utils;
 
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
+import com.auth.exception.JwtTokenException;
+import io.jsonwebtoken.*;
 
 @Component
 public class JwtUtils {
@@ -33,17 +34,26 @@ public class JwtUtils {
                     .parseSignedClaims(authToken); // Use parseSignedClaims() instead of parseClaimsJws()
             return true;
         } catch (Exception e) {
-            return false;
+            throw new JwtTokenException("Invalid or expired token.");
         }
     }
 
     // Get username from JWT token
     public String getUserNameFromJwtToken(String token) {
-        return Jwts.parser()
-                .verifyWith(jwtSecret)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+        try {
+            return Jwts.parser()
+                    .verifyWith(jwtSecret)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();
+        } catch (ExpiredJwtException ex) {
+            throw new JwtTokenException("Token expired! Please login again.");
+        } catch (@SuppressWarnings("deprecation") UnsupportedJwtException | MalformedJwtException
+                | SignatureException ex) {
+            throw new JwtTokenException("Invalid token! Authentication failed.");
+        } catch (Exception ex) {
+            throw new JwtTokenException("Authentication error: " + ex.getMessage());
+        }
     }
 }

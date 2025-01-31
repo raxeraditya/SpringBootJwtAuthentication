@@ -1,7 +1,7 @@
 package com.auth.config;
 
+import com.auth.services.MyUserDetailsService;
 import com.auth.utils.JwtAuthenticationFilter;
-import com.auth.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,13 +24,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private MyUserDetailsService myUserDetailsService;
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    @Autowired
-    private JwtUtils jwtUtils;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -56,8 +52,15 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
             throws Exception {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(myUserDetailsService); // return user
+        provider.setPasswordEncoder(passwordEncoder()); // Ensures that passwords are encoded before comparison.
         return new ProviderManager(provider);
     }
 }
+
+// Why Is This Needed?
+// ✅ Customizes authentication logic: Uses your UserDetailsService instead of
+// Spring's default.
+// ✅ Enables password hashing: Ensures passwords are securely compared.
+// ✅ Allows Spring Security to use authenticationManager.authenticate() for
+// login.
