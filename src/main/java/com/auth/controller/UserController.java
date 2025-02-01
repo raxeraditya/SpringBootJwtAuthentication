@@ -7,7 +7,6 @@ import com.auth.utils.JwtUtils;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import com.auth.Dto.LoginRequest;
 import com.auth.Dto.LoginResponse;

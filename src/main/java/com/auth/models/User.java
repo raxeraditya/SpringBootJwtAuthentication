@@ -24,12 +24,9 @@ public class User implements UserDetails {
     private String email;
     private String password;
 
-    // Define a role field (defaulting to "USER")
-    private String role = "USER";
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(role));
+        return Collections.singleton(new SimpleGrantedAuthority("USER"));
     }
 
     @Override
